@@ -14,15 +14,17 @@ struct Food
     int price;
     Object ingredient_1;
     Object ingredient_2;
+    int id;
 };
 
 class GameInfo
 { 
-public:  //hacer getter y setter de los atributos
+private:
     Object recipeList[10];
     Object ingredientsList[10];
     Food foodList[10];
 
+public:
     GameInfo()
     {
 
@@ -111,55 +113,68 @@ public:  //hacer getter y setter de los atributos
 
         //lista de comidas
         foodList[0].foodName = recipeList[0].name;     //fideos
+        foodList[0].id = recipeList[0].id;     
         foodList[0].price = recipeList[0].price * 2;
         foodList[0].ingredient_1 = ingredientsList[5]; //harina
-        foodList[0].ingredient_1 = ingredientsList[0]; //huevo
+        foodList[0].ingredient_2 = ingredientsList[0]; //huevo
 
         foodList[1].foodName = recipeList[1].name;     //sushi
+        foodList[1].id = recipeList[1].id;     
         foodList[1].price = recipeList[1].price * 2;
         foodList[1].ingredient_1 = ingredientsList[3]; //arroz
-        foodList[1].ingredient_1 = ingredientsList[4]; //salmon
+        foodList[1].ingredient_2 = ingredientsList[4]; //salmon
 
         foodList[2].foodName = recipeList[2].name;     //cinnamon roll
+        foodList[2].id = recipeList[2].id;     
         foodList[2].price = recipeList[2].price * 2;
         foodList[2].ingredient_1 = ingredientsList[1]; //canela
-        foodList[2].ingredient_1 = ingredientsList[5]; //harina
+        foodList[2].ingredient_2 = ingredientsList[5]; //harina
 
         foodList[3].foodName = recipeList[3].name;     //batido de fresa
+        foodList[3].id = recipeList[3].id;     
         foodList[3].price = recipeList[3].price * 2;
         foodList[3].ingredient_1 = ingredientsList[2]; //fresa
-        foodList[3].ingredient_1 = ingredientsList[9]; //leche
+        foodList[3].ingredient_2 = ingredientsList[9]; //leche
 
         foodList[4].foodName = recipeList[4].name;     //panettone
+        foodList[4].id = recipeList[4].id;     
         foodList[4].price = recipeList[4].price * 2;
         foodList[4].ingredient_1 = ingredientsList[5]; //harina
-        foodList[4].ingredient_1 = ingredientsList[8]; //chips choco
+        foodList[4].ingredient_2 = ingredientsList[8]; //chips choco
 
         foodList[5].foodName = recipeList[5].name;     //poke
+        foodList[5].id = recipeList[5].id;    
         foodList[5].price = recipeList[5].price * 2;
         foodList[5].ingredient_1 = ingredientsList[3]; //arroz
-        foodList[5].ingredient_1 = ingredientsList[4]; //salmon
+        foodList[5].ingredient_2 = ingredientsList[4]; //salmon
 
         foodList[6].foodName = recipeList[6].name;     //tarta fresa
+        foodList[6].id = recipeList[6].id;     
         foodList[6].price = recipeList[6].price * 2;
         foodList[6].ingredient_1 = ingredientsList[2]; //fresa
-        foodList[6].ingredient_1 = ingredientsList[5]; //harina
+        foodList[6].ingredient_2 = ingredientsList[5]; //harina
 
         foodList[7].foodName = recipeList[7].name;     //tarta queso
+        foodList[7].id = recipeList[7].id;    
         foodList[7].price = recipeList[7].price * 2;
         foodList[7].ingredient_1 = ingredientsList[0]; //huevo
-        foodList[7].ingredient_1 = ingredientsList[6]; //queso
+        foodList[7].ingredient_2 = ingredientsList[6]; //queso
 
         foodList[8].foodName = recipeList[8].name;     //pizza
+        foodList[8].id = recipeList[8].id;    
         foodList[8].price = recipeList[8].price * 2;
         foodList[8].ingredient_1 = ingredientsList[5]; //harina
-        foodList[8].ingredient_1 = ingredientsList[6]; //queso
+        foodList[8].ingredient_2 = ingredientsList[6]; //queso
 
         foodList[9].foodName = recipeList[9].name;     //tortilla
+        foodList[9].id = recipeList[9].id;   
         foodList[9].price = recipeList[9].price * 2;
         foodList[9].ingredient_1 = ingredientsList[0]; //huevo
-        foodList[9].ingredient_1 = ingredientsList[7]; //papa
+        foodList[9].ingredient_2 = ingredientsList[7]; //papa
     }
+    Object* getRecipeList() const;
+    Object* getIngredientsList() const;
+    Food* getFoodList() const;
 
     void showRecipeStore();
     void showIngredientsStore();

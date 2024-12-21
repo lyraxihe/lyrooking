@@ -2,6 +2,39 @@
 #include "GameInfo.h"
 #include <iostream>
 
+Object* GameInfo::getRecipeList() const
+{
+    Object* recipeCopy = new Object[10];
+
+    for (int i = 0; i < 10; ++i)
+    {
+        recipeCopy[i] = recipeList[i];
+    }
+    return recipeCopy;
+}
+
+Object* GameInfo::getIngredientsList() const
+{
+    Object* ingredientsCopy = new Object[10];
+
+    for (int i = 0; i < 10; ++i)
+    {
+        ingredientsCopy[i] = ingredientsList[i];
+    }
+    return ingredientsCopy;
+}
+
+Food* GameInfo::getFoodList() const
+{
+    Food* foodCopy = new Food[10];
+
+    for (int i = 0; i < 10; ++i)
+    {
+        foodCopy[i] = foodList[i]; 
+    }
+    return foodCopy;
+}
+
 void GameInfo::showRecipeStore()
 {
     std::cout << std::endl <<"Recipe Store:\n";
@@ -45,6 +78,6 @@ void GameInfo::showIngredientsInventory(int ingredientsInventory[10])
     std::cout << "----------------------------------------\n";
     for (int i = 0; i < 10; ++i)
     {
-        std::cout << ingredientsList[i].name << ": " << ingredientsInventory[i] << "unidades" << "\n";
+        std::cout << ingredientsList[i].name << ": " << ingredientsInventory[i] << " unidades" << "\n";
     }
 }

@@ -48,10 +48,9 @@ int main(int argc, char* argv[])
     string prefix = "Client:";
     obtainNewPort(s, &server_addr, prefix);
     std::cout << "Client already obtained new port: " << ntohs(server_addr.sin_port) << std::endl;
-    enum Operation ops[MAX_MSGS] = { SUM, DIFF, PROD, DIV, POWER };
     for (int i = 0; i < MAX_MSGS; i++) {
         //create packet and allocate for response
-        PDataPacket packet = new DataPacket(client, i, i * 7, ops[i], i + 3);
+        PDataPacket packet = new DataPacket(client, i, 0, 1, NULL, NULL, NULL);
         std::cout << "Client ready to send: " << *packet << std::endl;
         PDataPacket response = new DataPacket();
 

@@ -9,6 +9,7 @@
 #include <string>
 #include <assert.h>
 #include "GameInfo.h"
+#include "PlayerInfo.h"
 
 #define MSG_SIZE 256
 enum Operation
@@ -17,23 +18,41 @@ enum Operation
 };
 
 // dos ints estarían bien, el primero la opción y el segundo el objecto que quiera comprar (en caso de comprar)
-typedef class DataPacket {
+typedef class DataPacket 
+{
 public:
     int client_id;
     int sequence;
-    int op1;
-    enum Operation operation;
-    int op2;
-    long long res;
+    int option;
+    int index;
+    bool copyRecipeInventory[10];
+    int copyIngredientsInventory[10];
+    int copyMoney;
     DataPacket() {};
-    DataPacket(int _client_id, int _sequence, int _op1, enum Operation _operation, int _op2) 
+    DataPacket(int _client_id, int _sequence, int _option, int _index, bool* _copyRecipeInventory, int* _copyIngredientsInventory, int _copyMoney)
     {
         client_id = _client_id;
         sequence = _sequence;
-        op1 = _op1;
-        operation = _operation;
-        op2 = _op2;
-        res = INFINITE;
+        option = _option;
+        index = _index;
+        if (_copyRecipeInventory)
+        {
+            for (int i = 0; i < 10; ++i)
+            {
+                copyRecipeInventory[i] = _copyRecipeInventory[i];
+            }
+        }
+        if (_copyIngredientsInventory)
+        {
+            for (int i = 0; i < 10; ++i)
+            {
+                copyIngredientsInventory[i] = _copyIngredientsInventory[i];
+            }
+        }
+        if (_copyMoney)
+        {
+            copyMoney = _copyMoney;
+        }
     }
 } *PDataPacket;
 
@@ -42,6 +61,7 @@ public:
     int thread_id;
     SOCKET s;
     std::string prefix;
+
     ThreadInfo() {};
     ThreadInfo(int _thread_id, SOCKET _s, std::string _prefix) {
         thread_id = _thread_id;

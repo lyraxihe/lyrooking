@@ -10,10 +10,8 @@
 std::ostream& operator << (std::ostream& os, const DataPacket& dp) {
     return (os << "DataPacket{client: " << dp.client_id
         << " seq: " << dp.sequence
-        << " op1: " << dp.op1
-        << " operation: " << dp.operation
-        << " op2: " << dp.op2
-        << " res: " << dp.res << "}");
+        << " option: " << dp.option
+        << " index: " << dp.index << "}");
 }
 
 //will print msg with WSAGetLastError, then closesocket

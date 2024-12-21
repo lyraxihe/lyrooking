@@ -17,13 +17,16 @@ using namespace std;
 #define MAX_THREADS 5
 
 HANDLE serverFun(PDataPacket clientPacket, SOCKET s, sockaddr_in* client_addr, int i, string prefix);
-int serverThreadFun(PDataPacket clientPacket);
+int serverThreadFun(PDataPacket clientPacket, GameInfo *Game, PlayerInfo *Player);
 
 DWORD WINAPI threadFun(LPVOID param);
+
+Food newClientFood(GameInfo Game);
 
 
 int main()
 {
+    srand(static_cast<unsigned int>(time(0)));
     string prefix = "Server: ";
     std::cout << "Server: starting..." << std::endl;
     //required intialization of WinSock 2 library, it writes some data om wsaData to check everything is ok
@@ -90,7 +93,6 @@ int main()
 }
 
 
-//makes operation with op1 and op2 storing the result in res, all of them fields of clientPacket
 HANDLE serverFun(PDataPacket clientPacket, SOCKET s, sockaddr_in* client_addr, int i, string prefix) {
     int result = -1;
     //now we create a socket that uses IP (AF_INET) with UDP (SOCK_DGRAM, IPPROTO_UDP) 
@@ -118,13 +120,13 @@ HANDLE serverFun(PDataPacket clientPacket, SOCKET s, sockaddr_in* client_addr, i
     }
     std::cout << "Server: socket bound to address: " << address << " port: " << ntohs(my_addr.sin_port) << std::endl;
 
-    //sendtoMsg(...new_port...) through the new one, because getsockname apparently only works with connection oriented sockets!
-    // remember that ALL UDP DATAGRAMS contain implicitly the network address of the sender, and this address is available when
-    // doing recvfrom
     sendtoMsg(s_new, client_addr, clientPacket, prefix);
     //create object that serves as param for the thread function
+
     PThreadInfo thInfo = new ThreadInfo(i, s_new, prefix);
     //call to thread(... s_new ...) with the new socket that only the thread will use
+
+
     DWORD dwThreadId;
     HANDLE hThread = CreateThread(
         NULL,                   // default security attributes
@@ -147,6 +149,31 @@ DWORD WINAPI threadFun(LPVOID param) {
     PThreadInfo thInfo = (ThreadInfo*)param;
     bool serve = true;
     PDataPacket packet = new DataPacket();
+
+
+        GameInfo Game;
+        PlayerInfo Player;
+
+        for (int i = 0; i < 10; i++)
+        {
+            if (Player.getMoney() >= Game.getRecipeList()[i].price)
+            {
+                Player.setMoney(-Game.getRecipeList()[i].price);
+                Player.setNewRecipe(Game.getRecipeList()[i].id);
+            }
+        }
+
+        for (int i = 0; i < 10; i++)
+        {
+            if (Player.getMoney() >= Game.getIngredientsList()[i].price)
+            {
+                Player.setMoney(-Game.getIngredientsList()[i].price);
+                Player.setIngredients(i, 2);
+            }
+        }
+
+
+
     while (serve) {
         std::cout << "Server Thread ready to recv" << std::endl;
         //recv msg, then cast it to DataPacket and call serverFun
@@ -158,7 +185,7 @@ DWORD WINAPI threadFun(LPVOID param) {
         DataPacket clientPacket = (DataPacket)*packet;
 
         //do something
-        if (!serverThreadFun(&clientPacket)) {
+        if (!serverThreadFun(&clientPacket, &Game, &Player)) {
             sendtoMsg(thInfo->s, &client_addr, &clientPacket, thInfo->prefix);
         }
         else { //if there is an error in serverThreadFun, or if the client sent some other unknown operation, close thread
@@ -173,14 +200,67 @@ DWORD WINAPI threadFun(LPVOID param) {
 }
 
 //makes operation with op1 and op2 storing the result in res, all of them fields of clientPacket
-int serverThreadFun(PDataPacket clientPacket) 
+int serverThreadFun(PDataPacket clientPacket, GameInfo *Game, PlayerInfo *Player) 
 {
-    GameInfo Game;
-    PlayerInfo Player;
+  
     bool exit = false;
     while (!exit)
     {
-        Food clientFood = newClientFood(Game);
+      /*  Game.showIngredientsStore();
+        Game.showRecipeStore();*/
+
+        //Game.showRecipeInventory(Player.getRecipeInventory());
+        cout << "money: " << (*Player).getMoney() << endl;
+        Food clientFood = newClientFood(*Game);
+        std::cout << "nuevo cliente! \nPedido: " << clientFood.foodName << "\ningredientes: " << clientFood.ingredient_1.name << " y " << clientFood.ingredient_2.name << "\n";
+        switch (clientPacket->option)
+        {
+
+            case 0:
+                if ((*Player).getRecipeInventory()[clientFood.id] && ((*Player).getIngredientsInventory()[clientFood.ingredient_1.id]) > 0 && ((*Player).getIngredientsInventory()[clientFood.ingredient_2.id]) > 0)
+                {
+                    (*Player).setIngredients(clientFood.ingredient_1.id, -1);
+                    (*Player).setIngredients(clientFood.ingredient_2.id, -1);
+                    (*Player).setMoney(clientFood.price);
+                    cout << "receta " << clientFood.foodName << " hecha" << endl;
+                }
+                (*Game).showIngredientsInventory((*Player).getIngredientsInventory());
+
+                 break;
+
+            case 1:
+
+                break;
+
+            case 2:
+
+                break;
+
+            case 3:
+
+                break;
+
+            case 4:
+
+                break;
+
+            case 5:
+
+                break;
+
+            case 6:
+
+                break;
+
+            case 7:
+
+                break;
+        }
+
+
+
+        exit = true;
+        
         //enviar datapacket con el food.
         //imprimir lo siguiente en el cliente
         // 
@@ -220,7 +300,7 @@ int serverThreadFun(PDataPacket clientPacket)
 
 Food newClientFood(GameInfo Game)
 {
-    srand(static_cast<unsigned int>(time(0)));
+
     int random_number = rand() % 10;
-    return Game.foodList[random_number];
+    return Game.getFoodList()[random_number];
 }
