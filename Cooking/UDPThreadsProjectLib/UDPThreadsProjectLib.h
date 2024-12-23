@@ -9,32 +9,30 @@
 #include <string>
 #include <assert.h>
 #include "GameInfo.h"
-#include "PlayerInfo.h"
 
 #define MSG_SIZE 256
-enum Operation
-{
-    SUM, DIFF, PROD, DIV, POWER
-};
 
 // dos ints estarían bien, el primero la opción y el segundo el objecto que quiera comprar (en caso de comprar)
 typedef class DataPacket 
 {
 public:
     int client_id;
-    int sequence;
     int option;
     int index;
+    Food clientFood;
     bool copyRecipeInventory[10];
     int copyIngredientsInventory[10];
     int copyMoney;
+    bool exitoso;
     DataPacket() {};
-    DataPacket(int _client_id, int _sequence, int _option, int _index, bool* _copyRecipeInventory, int* _copyIngredientsInventory, int _copyMoney)
+    DataPacket(int _client_id, int _option, int _index, Food _clientFood, bool* _copyRecipeInventory, int* _copyIngredientsInventory, int _copyMoney, bool _exitoso)
     {
         client_id = _client_id;
-        sequence = _sequence;
         option = _option;
         index = _index;
+        clientFood = _clientFood;
+        exitoso = _exitoso;
+
         if (_copyRecipeInventory)
         {
             for (int i = 0; i < 10; ++i)

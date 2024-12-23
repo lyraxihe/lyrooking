@@ -3,14 +3,14 @@ class PlayerInfo
 {
 private:
 	int money = 5000;
-	bool recipeInventory[10] = { false, false, false, false, false };
+	bool recipeInventory[10] = { false, false, false, false, false, false, false, false, false, false };
 	int ingredientsInventory[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 public:
-
+	PlayerInfo();
 	int getMoney();
-	bool* getRecipeInventory() const;
-	int* getIngredientsInventory() const;
+	bool* getRecipeInventory();
+	int* getIngredientsInventory();
 
 	void setMoney(int price); //negativo para restar, positivo para sumar
 	void setNewRecipe(int recipeIndex);

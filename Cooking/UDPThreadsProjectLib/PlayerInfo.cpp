@@ -1,12 +1,17 @@
 #include "pch.h"
 #include "PlayerInfo.h"
 
+PlayerInfo::PlayerInfo()
+{
+
+}
+
 int PlayerInfo::getMoney()
 {
 	return money;
 }
 
-bool* PlayerInfo::getRecipeInventory() const
+bool* PlayerInfo::getRecipeInventory()
 {
 	bool* copyRecipeInventory = new bool[10];
 	for (int i = 0; i < 10; ++i)
@@ -17,7 +22,7 @@ bool* PlayerInfo::getRecipeInventory() const
 
 }
 
-int* PlayerInfo::getIngredientsInventory() const
+int* PlayerInfo::getIngredientsInventory()
 {
 	int* copyIngredientsInventory = new int[10];
 	for (int i = 0; i < 10; ++i)

@@ -9,7 +9,6 @@
 
 std::ostream& operator << (std::ostream& os, const DataPacket& dp) {
     return (os << "DataPacket{client: " << dp.client_id
-        << " seq: " << dp.sequence
         << " option: " << dp.option
         << " index: " << dp.index << "}");
 }
@@ -37,7 +36,7 @@ int sendtoMsg(SOCKET s, sockaddr_in* dest_addr, PDataPacket packet, std::string 
     int result = sendto(s, (char*)packet, sizeof(DataPacket), 0, (SOCKADDR*)dest_addr, sizeof(SOCKADDR));
     assert(result != SOCKET_ERROR);
 
-    std::cout << prefix << " succesfully sent msg: " << *packet << std::endl;
+    //std::cout << prefix << " succesfully sent msg: " << *packet << std::endl;
     return result;
 }
 
@@ -50,7 +49,7 @@ int recvfromMsg(SOCKET s, sockaddr_in* sender_addr, PDataPacket response, std::s
     int result = recvfrom(s, (char*)response, sizeof(DataPacket), 0, (SOCKADDR*)sender_addr, &fromlen);
     assert(result != SOCKET_ERROR);
 
-    std::cout << prefix << " succesfully received: " << *response << std::endl;
+    //std::cout << prefix << " succesfully received: " << *response << std::endl;
     return result;
 }
 
@@ -78,7 +77,7 @@ int sendMsg(SOCKET acceptSocket, PDataPacket packet, std::string prefix) {
         treatError(std::format("{} send error: ", prefix), acceptSocket);
     }
     else {
-        std::cout << prefix << " succesfully sent msg: " << *packet << std::endl;
+        //std::cout << prefix << " succesfully sent msg: " << *packet << std::endl;
     }
     return sbyteCount;
 }
@@ -91,7 +90,7 @@ int recvMsg(SOCKET acceptSocket, PDataPacket recv_msg, std::string prefix) {
     }
     else {
         DataPacket clientPacket = (DataPacket)*recv_msg;
-        std::cout << prefix << " succesfully received: " << clientPacket << std::endl;
+        //std::cout << prefix << " succesfully received: " << clientPacket << std::endl;
     }
     return rbyteCount;
 }
