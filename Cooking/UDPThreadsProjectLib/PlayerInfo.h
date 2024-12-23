@@ -2,7 +2,7 @@
 class PlayerInfo
 {
 private:
-	int money = 5000;
+	int money = 200;
 	bool recipeInventory[10] = { false, false, false, false, false, false, false, false, false, false };
 	int ingredientsInventory[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 

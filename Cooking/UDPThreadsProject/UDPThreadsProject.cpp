@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     obtainNewPort(s, &server_addr, prefix);
     std::cout << "Client already obtained new port: " << ntohs(server_addr.sin_port) << std::endl;
 
-    std::cout << "Lyrooking !" << std::endl;
+    std::cout << std::endl << std::endl << "Lyrooking !" << std::endl;
     bool exit = false;
     int option = 0;
     int index;
@@ -73,18 +73,18 @@ int main(int argc, char* argv[])
     while (!exit)
     {
 
-        std::cout << std::endl << std::endl << std::endl;
+        std::cout << std::endl << std::endl;
        
-        std::cout << "Pedido de cliente: " << clientFood.foodName << "\ningredientes: " << clientFood.ingredient_1.name << " y " << clientFood.ingredient_2.name << std::endl << std::endl;
-        std::cout << "Elegí alguna de las siguientes opciones: " << std::endl;
-        std::cout << "1.  atender al cliente" << std::endl;
-        std::cout << "2.  abrir inventario de recetas" << std::endl;
-        std::cout << "3.  abrir inventario de ingredientes" << std::endl;
-        std::cout << "4.  abrir tienda de recetas" << std::endl;
-        std::cout << "5.  abrir tienda de ingredientes" << std::endl;
-        std::cout << "6.  pasar al siguiente cliente" << std::endl; 
-        std::cout << "7.  salir del juego" << std::endl;    
-        std::cout << "opción: ";
+        std::cout << "Customer's order: " << clientFood.foodName << "\ningredients: " << clientFood.ingredient_1.name << " and " << clientFood.ingredient_2.name << std::endl << std::endl;
+        std::cout << "Choose one of the following options: " << std::endl;
+        std::cout << "1.  serve the customer" << std::endl;
+        std::cout << "2.  open recipe inventory" << std::endl;
+        std::cout << "3.  open ingredient inventory" << std::endl;
+        std::cout << "4.  open recipe store" << std::endl;
+        std::cout << "5.  open ingredient store" << std::endl;
+        std::cout << "6.  move to the next customer" << std::endl;
+        std::cout << "7.  exit the game" << std::endl;
+        std::cout << "option: ";
         std::cin >> option;
 
         if (option > 0 && option < 8)
@@ -97,8 +97,8 @@ int main(int argc, char* argv[])
                     sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                     if (response->exitoso)
                     {
-                        std::cout << "Se realizó el pedido " << clientFood.foodName << std::endl;
-                        std::cout << "Dinero añadido: " << clientFood.price << std::endl;
+                        std::cout << "Order completed: " << clientFood.foodName << std::endl;
+                        std::cout << "Coins added: " << clientFood.price << std::endl;
 
 
                         packet = new DataPacket(client, 8, 0, clientFood.foodName, clientFood.id, clientFood.price, clientFood.ingredient_1.name, clientFood.ingredient_1.id, clientFood.ingredient_2.name, clientFood.ingredient_2.id, NULL, NULL, NULL, false);
@@ -112,12 +112,12 @@ int main(int argc, char* argv[])
                             clientFood.ingredient_1.id = response->idIngredient_1;
                             clientFood.ingredient_2.name = response->ingredientName_2;
                             clientFood.ingredient_2.id = response->idIngredient_2;
-                            std::cout << "Se ha pasado al siguiente cliente" << std::endl;
+                            std::cout << "Moved to the next customer" << std::endl;
                         }
                     }
                     else
                     {
-                        std::cout << "No se pudo realizar el pedido " << clientFood.foodName << std::endl;
+                        std::cout << "Could not complete the order " << clientFood.foodName << std::endl;
                     }
                     break;
                 }
@@ -144,20 +144,21 @@ int main(int argc, char* argv[])
                     sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                     Game.showRecipeStore();
                     std::cout << "Coins: " << response->copyMoney << std::endl << std::endl;
-                    std::cout << "Seleccione el indice de la receta que desea comprar o 10 para volver al menú" << std::endl;
-                    std::cout << "opción: ";
+                    std::cout << "Select the index of the recipe you want to buy or 10 to return to the menu" << std::endl;
+                    std::cout << "option: ";
                     std::cin >> index;
+
                     if (index >= 0 && index < 10)
                     {
                         packet = new DataPacket(client, 6, index, clientFood.foodName, clientFood.id, clientFood.price, clientFood.ingredient_1.name, clientFood.ingredient_1.id, clientFood.ingredient_2.name, clientFood.ingredient_2.id, NULL, NULL, NULL, false);
                         sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                         if (response->exitoso)
                         {
-                            std::cout << "Se añadió la receta de " << Game.getRecipeList()[index].name << " al inventario de recetas!" << std::endl;
+                            std::cout << "The recipe for " << Game.getRecipeList()[index].name << " has been added to the recipe inventory!" << std::endl;
                         }
                         else
                         {
-                            std::cout << "No se pudo comprar la receta de " << Game.getRecipeList()[index].name << std::endl;
+                            std::cout << "Could not buy the recipe for " << Game.getRecipeList()[index].name << std::endl;
                         }
                     }
                     break;
@@ -169,20 +170,22 @@ int main(int argc, char* argv[])
                     sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                     Game.showIngredientsStore();
                     std::cout << "Coins: " << response->copyMoney << std::endl << std::endl;
-                    std::cout << "Seleccione el indice del ingrediente que desea comprar o 10 para volver al menú" << std::endl;
-                    std::cout << "opción: ";
+                    std::cout << "Select the index of the ingredient you want to buy or 10 to return to the menu" << std::endl;
+                    std::cout << "option: ";
                     std::cin >> index;
+
                     if (index >= 0 && index < 10)
                     {
                         packet = new DataPacket(client, 7, index, clientFood.foodName, clientFood.id, clientFood.price, clientFood.ingredient_1.name, clientFood.ingredient_1.id, clientFood.ingredient_2.name, clientFood.ingredient_2.id, NULL, NULL, NULL, false);
                         sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                         if (response->exitoso)
                         {
-                            std::cout << "Se añadió el ingrediente " << Game.getIngredientsList()[index].name << " al inventario de ingredientes!" << std::endl;
+                            std::cout << "The ingredient " << Game.getIngredientsList()[index].name << " has been added to the ingredient inventory!" << std::endl;
+
                         }
                         else
                         {
-                            std::cout << "No se pudo comprar el ingrediente " << Game.getIngredientsList()[index].name << std::endl;
+                            std::cout << "Could not buy the ingredient " << Game.getIngredientsList()[index].name << std::endl;
                         }
                     }
                     break;
@@ -201,7 +204,7 @@ int main(int argc, char* argv[])
                         clientFood.ingredient_1.id = response->idIngredient_1;
                         clientFood.ingredient_2.name = response->ingredientName_2;
                         clientFood.ingredient_2.id = response->idIngredient_2;
-                        std::cout << "Se ha pasado al siguiente cliente" << std::endl;
+                        std::cout << "Moved to the next customer" << std::endl;
                     }
                     break;
                 }

@@ -145,7 +145,7 @@ DWORD WINAPI threadFun(LPVOID param) {
     PThreadInfo thInfo = (ThreadInfo*)param;
     bool serve = true;
 
-    //se crea el nuevo  juego y player, a la vez que la comida del primer cliente.
+    //se crea el nuevo juego y player
     GameInfo Game;
     PlayerInfo Player;
 
@@ -176,7 +176,6 @@ DWORD WINAPI threadFun(LPVOID param) {
 
 int serverThreadFun(PDataPacket clientPacket, GameInfo* Game, PlayerInfo* Player)
 {
-
         switch (clientPacket->option)
         {
             case 1:

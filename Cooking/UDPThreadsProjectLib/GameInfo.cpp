@@ -78,6 +78,6 @@ void GameInfo::showIngredientsInventory(int ingredientsInventory[10])
     std::cout << "----------------------------------------\n";
     for (int i = 0; i < 10; ++i)
     {
-        std::cout << ingredientsList[i].name << ": " << ingredientsInventory[i] << " unidades" << "\n";
+        std::cout << ingredientsList[i].name << ": " << ingredientsInventory[i] << " units" << "\n";
     }
 }
