@@ -10,14 +10,13 @@
 #include <Windows.h>
 
 #define MAX_MSGS 5
-using namespace std;
 
-int obtainNewPort(SOCKET s, sockaddr_in* server_addr, string prefix);
+int obtainNewPort(SOCKET s, sockaddr_in* server_addr, std::string prefix);
 
 int main(int argc, char* argv[])
 {
     if (argc < 2) {
-        cout << "UDPClient usage: .\\UDPClient <id>" << endl;
+        std::cout << "UDPClient usage: .\\UDPClient <id>" << std::endl;
         ExitProcess(-1);
     }
     int client = atoi(argv[1]);
@@ -45,7 +44,7 @@ int main(int argc, char* argv[])
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(4000);
 
-    string prefix = "Client:";
+    std::string prefix = "Client:";
     obtainNewPort(s, &server_addr, prefix);
     std::cout << "Client already obtained new port: " << ntohs(server_addr.sin_port) << std::endl;
 
@@ -61,13 +60,22 @@ int main(int argc, char* argv[])
 
     packet->option = 8;
     sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
-    Food clientFood;
+
+        Food clientFood;
+        clientFood.foodName = response->clientFoodName;
+        clientFood.id = response->idRecipe;
+        clientFood.price = response->clientFoodprice;
+        clientFood.ingredient_1.name = response->ingredientName_1;
+        clientFood.ingredient_1.id = response->idIngredient_1;
+        clientFood.ingredient_2.name = response->ingredientName_2;
+        clientFood.ingredient_2.id = response->idIngredient_2;
 
     while (!exit)
     {
+
         std::cout << std::endl << std::endl << std::endl;
        
-        std::cout << "Pedido de cliente: " << response->clientFood.foodName << "\ningredientes: " << response->clientFood.ingredient_1.name << " y " << response->clientFood.ingredient_2.name << std::endl << std::endl;
+        std::cout << "Pedido de cliente: " << clientFood.foodName << "\ningredientes: " << clientFood.ingredient_1.name << " y " << clientFood.ingredient_2.name << std::endl << std::endl;
         std::cout << "Elegí alguna de las siguientes opciones: " << std::endl;
         std::cout << "1.  atender al cliente" << std::endl;
         std::cout << "2.  abrir inventario de recetas" << std::endl;
@@ -77,7 +85,7 @@ int main(int argc, char* argv[])
         std::cout << "6.  pasar al siguiente cliente" << std::endl; 
         std::cout << "7.  salir del juego" << std::endl;    
         std::cout << "opción: ";
-        cin >> option;
+        std::cin >> option;
 
         if (option > 0 && option < 8)
         {
@@ -85,53 +93,54 @@ int main(int argc, char* argv[])
             {
                 case 1:
                 {
-                    packet = new DataPacket(client, 1, 0, clientFood, NULL, NULL, NULL, false);
+                    packet = new DataPacket(client, 1, 0, clientFood.foodName, clientFood.id, clientFood.price, clientFood.ingredient_1.name, clientFood.ingredient_1.id, clientFood.ingredient_2.name, clientFood.ingredient_2.id, NULL, NULL, NULL, false);
                     sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                     if (response->exitoso)
                     {
-                        std::cout << "Se realizó el pedido " << response->clientFood.foodName << std::endl;
-                        std::cout << "Dinero añadido: " << response->clientFood.price << std::endl;
+                        std::cout << "Se realizó el pedido " << clientFood.foodName << std::endl;
+                        std::cout << "Dinero añadido: " << clientFood.price << std::endl;
 
 
-                        packet = new DataPacket(client, 8, 0, clientFood, NULL, NULL, NULL, false);
+                        packet = new DataPacket(client, 8, 0, clientFood.foodName, clientFood.id, clientFood.price, clientFood.ingredient_1.name, clientFood.ingredient_1.id, clientFood.ingredient_2.name, clientFood.ingredient_2.id, NULL, NULL, NULL, false);
                         sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                         if (response->exitoso)
                         {
+                            clientFood.foodName = response->clientFoodName;
+                            clientFood.id = response->idRecipe;
+                            clientFood.price = response->clientFoodprice;
+                            clientFood.ingredient_1.name = response->ingredientName_1;
+                            clientFood.ingredient_1.id = response->idIngredient_1;
+                            clientFood.ingredient_2.name = response->ingredientName_2;
+                            clientFood.ingredient_2.id = response->idIngredient_2;
                             std::cout << "Se ha pasado al siguiente cliente" << std::endl;
                         }
                     }
                     else
                     {
-                        std::cout << "No se pudo realizar el pedido " << response->clientFood.foodName << std::endl;
+                        std::cout << "No se pudo realizar el pedido " << clientFood.foodName << std::endl;
                     }
-                    std::cout << "Presiona Enter para continuar...";
-                    std::cin.get();
                     break;
                 }
 
                 case 2:
                 {
-                    packet = new DataPacket(client, 2, 0, clientFood, NULL, NULL, NULL, false);
+                    packet = new DataPacket(client, 2, 0, clientFood.foodName, clientFood.id, clientFood.price, clientFood.ingredient_1.name, clientFood.ingredient_1.id, clientFood.ingredient_2.name, clientFood.ingredient_2.id, NULL, NULL, NULL, false);
                     sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                     Game.showRecipeInventory(response->copyRecipeInventory);
-                    std::cout << "Presiona Enter para continuar..."; 
-                    std::cin.get();
                     break;
                 }
 
                 case 3:
                 {
-                    packet = new DataPacket(client, 3, 0, clientFood, NULL, NULL, NULL, false);
+                    packet = new DataPacket(client, 3, 0, clientFood.foodName, clientFood.id, clientFood.price, clientFood.ingredient_1.name, clientFood.ingredient_1.id, clientFood.ingredient_2.name, clientFood.ingredient_2.id, NULL, NULL, NULL, false);
                     sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                     Game.showIngredientsInventory(response->copyIngredientsInventory);
-                    std::cout << "Presiona Enter para continuar...";
-                    std::cin.get();
                     break;
                 }
 
                 case 4:
                 {
-                    packet = new DataPacket(client, 4, 0, clientFood, NULL, NULL, NULL, false);
+                    packet = new DataPacket(client, 4, 0, clientFood.foodName, clientFood.id, clientFood.price, clientFood.ingredient_1.name, clientFood.ingredient_1.id, clientFood.ingredient_2.name, clientFood.ingredient_2.id, NULL, NULL, NULL, false);
                     sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                     Game.showRecipeStore();
                     std::cout << "Coins: " << response->copyMoney << std::endl << std::endl;
@@ -140,7 +149,7 @@ int main(int argc, char* argv[])
                     std::cin >> index;
                     if (index >= 0 && index < 10)
                     {
-                        packet = new DataPacket(client, 6, index, clientFood, NULL, NULL, NULL, false);
+                        packet = new DataPacket(client, 6, index, clientFood.foodName, clientFood.id, clientFood.price, clientFood.ingredient_1.name, clientFood.ingredient_1.id, clientFood.ingredient_2.name, clientFood.ingredient_2.id, NULL, NULL, NULL, false);
                         sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                         if (response->exitoso)
                         {
@@ -151,14 +160,12 @@ int main(int argc, char* argv[])
                             std::cout << "No se pudo comprar la receta de " << Game.getRecipeList()[index].name << std::endl;
                         }
                     }
-                    std::cout << "Presiona Enter para continuar...";
-                    std::cin.get();
                     break;
                 }
 
                 case 5:
                 {
-                    packet = new DataPacket(client, 5, 0, clientFood, NULL, NULL, NULL, false);
+                    packet = new DataPacket(client, 5, 0, clientFood.foodName, clientFood.id, clientFood.price, clientFood.ingredient_1.name, clientFood.ingredient_1.id, clientFood.ingredient_2.name, clientFood.ingredient_2.id, NULL, NULL, NULL, false);
                     sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                     Game.showIngredientsStore();
                     std::cout << "Coins: " << response->copyMoney << std::endl << std::endl;
@@ -167,7 +174,7 @@ int main(int argc, char* argv[])
                     std::cin >> index;
                     if (index >= 0 && index < 10)
                     {
-                        packet = new DataPacket(client, 7, index, clientFood, NULL, NULL, NULL, false);
+                        packet = new DataPacket(client, 7, index, clientFood.foodName, clientFood.id, clientFood.price, clientFood.ingredient_1.name, clientFood.ingredient_1.id, clientFood.ingredient_2.name, clientFood.ingredient_2.id, NULL, NULL, NULL, false);
                         sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
                         if (response->exitoso)
                         {
@@ -178,18 +185,22 @@ int main(int argc, char* argv[])
                             std::cout << "No se pudo comprar el ingrediente " << Game.getIngredientsList()[index].name << std::endl;
                         }
                     }
-                    std::cout << "Presiona Enter para continuar...";
-                    std::cin.get();
                     break;
                 }
 
                 case 6:
                 {
-                    packet = new DataPacket(client, 8, 0, clientFood, NULL, NULL, NULL, false);
+                    packet = new DataPacket(client, 8, 0, clientFood.foodName, clientFood.id, clientFood.price, clientFood.ingredient_1.name, clientFood.ingredient_1.id, clientFood.ingredient_2.name, clientFood.ingredient_2.id, NULL, NULL, NULL, false);
                     sendtorecvfromMsg(s, &server_addr, packet, response, "Client:");
-                    cout << "recibiooooo !" << endl;
                     if (response->exitoso)
                     {
+                        clientFood.foodName = response->clientFoodName;
+                        clientFood.id = response->idRecipe;
+                        clientFood.price = response->clientFoodprice;
+                        clientFood.ingredient_1.name = response->ingredientName_1;
+                        clientFood.ingredient_1.id = response->idIngredient_1;
+                        clientFood.ingredient_2.name = response->ingredientName_2;
+                        clientFood.ingredient_2.id = response->idIngredient_2;
                         std::cout << "Se ha pasado al siguiente cliente" << std::endl;
                     }
                     break;
@@ -218,7 +229,7 @@ int main(int argc, char* argv[])
 }
 
 //sends first msg to server and returns with the new server_addr used for the server for the dedicated socket
-int obtainNewPort(SOCKET s, sockaddr_in* server_addr, string prefix) {
+int obtainNewPort(SOCKET s, sockaddr_in* server_addr, std::string prefix) {
     PDataPacket packet = new DataPacket(); //I don't initialize because the server won't care
     std::cout << "Client ready to send: " << *packet << std::endl;
     PDataPacket response = new DataPacket();

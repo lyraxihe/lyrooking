@@ -11,12 +11,10 @@
 #include "PlayerInfo.h"
 #include <cstdlib>
 
-using namespace std;
-
 #define MAX_THREADS 5
 
-HANDLE serverFun(PDataPacket clientPacket, SOCKET s, sockaddr_in* client_addr, int i, string prefix);
-int serverThreadFun(PDataPacket clientPacket, GameInfo *Game, PlayerInfo *Player, Food *clientFood);
+HANDLE serverFun(PDataPacket clientPacket, SOCKET s, sockaddr_in* client_addr, int i, std::string prefix);
+int serverThreadFun(PDataPacket clientPacket, GameInfo *Game, PlayerInfo *Player);
 
 DWORD WINAPI threadFun(LPVOID param);
 
@@ -26,7 +24,7 @@ Food newClientFood(GameInfo Game);
 int main()
 {
     srand(static_cast<unsigned int>(time(0)));
-    string prefix = "Server: ";
+    std::string prefix = "Server: ";
     std::cout << "Server: starting..." << std::endl;
     //required intialization of WinSock 2 library, it writes some data om wsaData to check everything is ok
     int result;
@@ -85,19 +83,19 @@ int main()
     for (int i = 0; i < MAX_THREADS; i++) {
         CloseHandle(hThreadArray[i]);
     }
-    std::cout << "Server: cleaning up and returning" << endl;
+    std::cout << "Server: cleaning up and returning" << std::endl;
     // cleanup
     closesocket(s);
     WSACleanup();
 }
 
 
-HANDLE serverFun(PDataPacket clientPacket, SOCKET s, sockaddr_in* client_addr, int i, string prefix) {
+HANDLE serverFun(PDataPacket clientPacket, SOCKET s, sockaddr_in* client_addr, int i, std::string prefix) {
     int result = -1;
     //now we create a socket that uses IP (AF_INET) with UDP (SOCK_DGRAM, IPPROTO_UDP) 
     SOCKET s_new = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (s_new == INVALID_SOCKET) {
-        treatErrorExit(format("Server: Thread[{}] socket creation error: ", i), s, -1);
+        treatErrorExit(std::format("Server: Thread[{}] socket creation error: ", i), s, -1);
     }
     std::cout << "Server: socket created" << std::endl;
 
@@ -105,7 +103,7 @@ HANDLE serverFun(PDataPacket clientPacket, SOCKET s, sockaddr_in* client_addr, i
     sockaddr_in my_addr;
     PCSTR address = "127.0.0.1";
     if (!inet_pton(AF_INET, address, &(my_addr.sin_addr.s_addr))) { // Replace with your desired IP address
-        treatErrorExit(format("Server: Thread[{}] error converting IP in string to binary: ", i), s, -1);
+        treatErrorExit(std::format("Server: Thread[{}] error converting IP in string to binary: ", i), s, -1);
     }
     my_addr.sin_family = AF_INET;
     //store bytes in network format == big-endian
@@ -146,15 +144,10 @@ HANDLE serverFun(PDataPacket clientPacket, SOCKET s, sockaddr_in* client_addr, i
 DWORD WINAPI threadFun(LPVOID param) {
     PThreadInfo thInfo = (ThreadInfo*)param;
     bool serve = true;
-    PDataPacket packet = new DataPacket();
 
     //se crea el nuevo  juego y player, a la vez que la comida del primer cliente.
     GameInfo Game;
     PlayerInfo Player;
-    Food clientFood = newClientFood(Game);
-
-    cout << "nuevo todo" << endl;
-
 
     while (serve) {
         std::cout << "Server Thread ready to recv" << std::endl;
@@ -162,20 +155,17 @@ DWORD WINAPI threadFun(LPVOID param) {
         //sockaddr_in client_addr;
         //recv msg, then cast it to DataPacket and call serverFun
         sockaddr_in client_addr;
+        PDataPacket packet = new DataPacket();
         recvfromMsg(thInfo->s, &client_addr, packet, "Server:");
         DataPacket clientPacket = (DataPacket)*packet;
-
-        ////envía el primer clientFood
-        //clientPacket.clientFood = clientFood;
-        //sendtoMsg(thInfo->s, &client_addr, &clientPacket, thInfo->prefix);
-
-        if (!serverThreadFun(&clientPacket, &Game, &Player, &clientFood)) 
+        if (!serverThreadFun(&clientPacket, &Game, &Player)) 
         {
             sendtoMsg(thInfo->s, &client_addr, &clientPacket, thInfo->prefix);
         }
         else 
         { //if there is an error in serverThreadFun, or if the client sent some other unknown operation, close thread
             serve = false; //will exit the loop and clean before returning
+            std::cout << "error al entrar en server threadfun" << std::endl;
         }
     }
     //cleanup of thread
@@ -184,33 +174,19 @@ DWORD WINAPI threadFun(LPVOID param) {
     return 0;
 }
 
-int serverThreadFun(PDataPacket clientPacket, GameInfo* Game, PlayerInfo* Player, Food *clientFood)
+int serverThreadFun(PDataPacket clientPacket, GameInfo* Game, PlayerInfo* Player)
 {
-    cout << "server thread fun ejecutandose" << endl;
 
         switch (clientPacket->option)
         {
             case 1:
             {
-                                        //if (!((*Player).getRecipeInventory()[(*clientFood).id]))
-                                        //{
-                                        //    cout << "no tiene la receta" << endl;
-                                        //}
-                                        //if (((*Player).getIngredientsInventory()[(*clientFood).ingredient_1.id]) < 0)
-                                        //{
-                                        //    cout << "no tiene ingrediente 1" << endl;
-                                        //}
-                                        //if (((*Player).getIngredientsInventory()[(*clientFood).ingredient_2.id]) < 0)
-                                        //{
-                                        //    cout << "no tiene ingrediente 2" << endl;
-                                        //}
-
                 //comprueba si se tiene la receta y los ingredientes, se restan los ingredientes y se suma la plata
-                if (((*Player).getRecipeInventory()[(*clientFood).id]) && ((*Player).getIngredientsInventory()[(*clientFood).ingredient_1.id]) > 0 && ((*Player).getIngredientsInventory()[(*clientFood).ingredient_2.id]) > 0)
+                if (((*Player).getRecipeInventory()[clientPacket->idRecipe]) && ((*Player).getIngredientsInventory()[clientPacket->idIngredient_1]) > 0 && ((*Player).getIngredientsInventory()[clientPacket->idIngredient_2]) > 0)
                 {
-                    (*Player).setIngredients((*clientFood).ingredient_1.id, -1);
-                    (*Player).setIngredients((*clientFood).ingredient_2.id, -1);
-                    (*Player).setMoney((*clientFood).price);
+                    (*Player).setIngredients(clientPacket->idIngredient_1, -1);
+                    (*Player).setIngredients(clientPacket->idIngredient_2, -1);
+                    (*Player).setMoney(clientPacket->clientFoodprice);
                     clientPacket->exitoso = true;
                 }
                 break;
@@ -252,43 +228,24 @@ int serverThreadFun(PDataPacket clientPacket, GameInfo* Game, PlayerInfo* Player
 
             case 6:
             {
-                                            //if (!((*Player).getRecipeInventory()[clientPacket->index]))
-                                            //{
-                                            //    cout << "no tiene la receta" << endl;
-                                            //}
-                                            //    cout << "plata: " << (*Player).getMoney() << endl;
-                                            //    cout << "precio receta: " << (*Game).getRecipeList()[clientPacket->index].price << endl;
-                                            //if ((*Player).getMoney() >= (*Game).getRecipeList()[clientPacket->index].price)
-                                            //{
-                                            //    cout << "tiene plata pa la receta" << endl;
-                                            //}
-
                 // comprueba si se tiene el dinero y si ya se compró esa receta, le actualiza el inventario de recetas, le resta dinero y asigna la operación como exitosa
                 if (!(*Player).getRecipeInventory()[clientPacket->index] && ((*Player).getMoney() >= (*Game).getRecipeList()[clientPacket->index].price))
                 {
                     (*Player).setNewRecipe(clientPacket->index);
                     (*Player).setMoney(-(*Game).getRecipeList()[clientPacket->index].price);
                     clientPacket->exitoso = true;
-                    cout << "exitoso" << endl;
                 }
                 break;
             }
 
             case 7:
             {
-                cout << "plata: " << (*Player).getMoney() << endl;
-                cout << "precio receta: " << (*Game).getIngredientsList()[clientPacket->index].price << endl;
-                if ((*Player).getMoney() >= (*Game).getIngredientsList()[clientPacket->index].price)
-                {
-                    cout << "tiene plata pa la receta" << endl;
-                }
                 //comprueba si se tiene el dinero, le suma una unidad al inventario de ingredientes, le resta dinero y asigna la operación como exitosa
                 if ((*Player).getMoney() >= (*Game).getIngredientsList()[clientPacket->index].price)
                 {
                     (*Player).setIngredients(clientPacket->index, 1);
                     (*Player).setMoney(-(*Game).getIngredientsList()[clientPacket->index].price);
                     clientPacket->exitoso = true;
-                    cout << "exitoso" << endl;
                 }
                 break;
             }
@@ -296,10 +253,16 @@ int serverThreadFun(PDataPacket clientPacket, GameInfo* Game, PlayerInfo* Player
             case 8:
             {
                 //pasa al siguiente cliente, es decir, crea un nuevo clientFood
-                (*clientFood) = newClientFood(*Game);
-                clientPacket->clientFood = (*clientFood);
+                Food clientFood = newClientFood(*Game);
+
+                clientPacket->clientFoodName = clientFood.foodName;
+                clientPacket->idRecipe = clientFood.id;
+                clientPacket->clientFoodprice = clientFood.price;
+                clientPacket->ingredientName_1 = clientFood.ingredient_1.name;
+                clientPacket->idIngredient_1 = clientFood.ingredient_1.id;
+                clientPacket->ingredientName_2 = clientFood.ingredient_2.name;
+                clientPacket->idIngredient_2 = clientFood.ingredient_2.id;
                 clientPacket->exitoso = true;
-                cout << (*clientFood).foodName << endl;
                 break;
             }
         }

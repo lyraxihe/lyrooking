@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include <time.h>
 #include <Windows.h>
 #include <iostream>
@@ -9,28 +8,45 @@
 #include <string>
 #include <assert.h>
 #include "GameInfo.h"
+#include <nlohmann/json.hpp>
+#include <iostream>
+using json = nlohmann::json;
 
-#define MSG_SIZE 256
 
-// dos ints estarían bien, el primero la opción y el segundo el objecto que quiera comprar (en caso de comprar)
+#define MSG_SIZE 512
+
 typedef class DataPacket 
 {
 public:
     int client_id;
     int option;
     int index;
-    Food clientFood;
+
+    std::string clientFoodName;
+    int idRecipe;
+    int clientFoodprice;
+    std::string ingredientName_1;
+    int idIngredient_1;
+    std::string ingredientName_2;
+    int idIngredient_2;
+
     bool copyRecipeInventory[10];
     int copyIngredientsInventory[10];
     int copyMoney;
     bool exitoso;
     DataPacket() {};
-    DataPacket(int _client_id, int _option, int _index, Food _clientFood, bool* _copyRecipeInventory, int* _copyIngredientsInventory, int _copyMoney, bool _exitoso)
+    DataPacket(int _client_id, int _option, int _index, std::string _clientFoodName, int _idRecipe, int _clientFoodprice, std::string _ingredientName_1, int _idIngredient_1, std::string _ingredientName_2, int _idIngredient_2, bool* _copyRecipeInventory, int* _copyIngredientsInventory, int _copyMoney, bool _exitoso)
     {
         client_id = _client_id;
         option = _option;
         index = _index;
-        clientFood = _clientFood;
+        clientFoodName = _clientFoodName;
+        idRecipe = _idRecipe;
+        clientFoodprice = _clientFoodprice;
+        ingredientName_1 = _ingredientName_1;
+        idIngredient_1 = _idIngredient_1;
+        ingredientName_2 = _ingredientName_2;
+        idIngredient_2 = _idIngredient_2;
         exitoso = _exitoso;
 
         if (_copyRecipeInventory)
@@ -78,6 +94,10 @@ std::ostream& operator << (std::ostream& os, const DataPacket& dp);
 void treatError(const std::string msg, SOCKET s);
 
 void treatErrorExit(const std::string msg, SOCKET s, int error);
+
+void to_json(json& j, const DataPacket& d);
+
+void from_json(const json& j, DataPacket& p);
 
 //UDP calls
 

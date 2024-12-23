@@ -1,0 +1,2 @@
+C:\Users\katym\Desktop\lyrooking\Cooking\UDPThreadsProjectServer\x64\Debug\UDPThreadsProjectServer.vcxproj.AssemblyReference.cache
+C:\Users\katym\Desktop\lyrooking\Cooking\UDPThreadsProjectServer\x64\Debug\UDPThrea.C9E56BDF.Up2Date
