@@ -1,0 +1,1 @@
+A console-based multiplayer cooking game built in C++, using raw UDP sockets and Windows threads for client-server communication. Players serve customer orders, manage recipe and ingredient inventories, and buy from in-game stores, with each client handled by a dedicated server thread.
